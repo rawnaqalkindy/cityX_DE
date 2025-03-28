@@ -2,7 +2,7 @@
 
 This project combines and cleans crime records from a JSON file and district details from a scanned PDF using OCR. The processed data is  stored in a PostgreSQL database (deployed via Docker). A Streamlit dashboard is provided to visualize key crime metrics.
 
-**Note:** This project has been containerized for consistent deployment. The dashboard component can be run locally with Streamlit if preferred.
+**Note:** This project has been containerized for consistent deployment. The dashboard component can be run locally with Streamlit.
 
 ## Setup & Installation
 
