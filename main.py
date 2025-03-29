@@ -5,6 +5,7 @@ from datetime import datetime
 import pytesseract
 from pdf2image import convert_from_path
 from sqlalchemy import create_engine
+from fuzzywuzzy import process  # For fuzzy matching
 
 # 1. Extracting data from pdf using OCR
 pdf = 'district_info.pdf'
@@ -28,8 +29,27 @@ district_df['district_id'] = district_df['district_id'].astype(int)
 district_df['population'] = district_df['population'].str.replace(',', '').astype(int)
 district_df['district_name'] = district_df['district_name'].str.replace(r'\|$', '', regex=True).str.strip()
 
-
 # 2. Loading and cleaning crime records 
+
+# Reference list of valid district names
+valid_district_names = [
+    'Machine Learning District',
+    'Data Engineering District',
+    'Data Analysis District',
+    'UI/UX District',
+    'Back-End District',
+    'Front-End District',
+]
+
+# Function to correct the district name by always choosing the best match
+def correct_district_name(ocr_name, valid_names):
+    best_match, score = process.extractOne(ocr_name, valid_names)
+    return best_match
+
+district_df['district_name'] = district_df['district_name'].apply(
+    lambda name: correct_district_name(name, valid_district_names)
+)
+
 crime_df = pd.read_json('crime_records.json')
 crime_df = crime_df[crime_df['crime_type'].notnull() & (crime_df['crime_type'].str.strip() != '')]
 
@@ -57,16 +77,16 @@ crime_df['day_of_week'] = crime_df['timestamp'].dt.day_name()
 crime_df['date'] = crime_df['timestamp'].dt.date
 crime_df['time'] = crime_df['timestamp'].dt.time
 
-# 3. Merge the datasets on distric_id
-revised_df = pd.merge(crime_df, district_df, on='district_id', how='left')
-final_df = revised_df[['district_id', 'district_name', 'crime_type',
-                     'nearest_police_patrol', 'population', 'governor',
-                     'day_of_week', 'date', 'time']]
+# 3. Merge the datasets on district_id
+merged_df = pd.merge(crime_df, district_df, on='district_id', how='left')
+final_df = merged_df[['district_id', 'district_name', 'crime_type',
+                        'nearest_police_patrol', 'population', 'governor',
+                        'day_of_week', 'date', 'time']]
 
 engine = create_engine('postgresql+psycopg2://user:password@localhost:5432/de_db')
 
-# Inserted the DataFrame into a table named 'de_data'
-revised_df.to_sql('de_data', engine, if_exists='replace', index=False)
+# Insert the DataFrame into a table named 'de_data'
+merged_df.to_sql('de_data', engine, if_exists='replace', index=False)
 
 print("Data successfully inserted into the PostgreSQL database")
-print(revised_df.head(15))
+print(merged_df.head(15))
