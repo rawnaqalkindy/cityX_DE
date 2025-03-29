@@ -30,26 +30,6 @@ district_df['population'] = district_df['population'].str.replace(',', '').astyp
 district_df['district_name'] = district_df['district_name'].str.replace(r'\|$', '', regex=True).str.strip()
 
 # 2. Loading and cleaning crime records 
-
-# Reference list of valid district names
-valid_district_names = [
-    'Machine Learning District',
-    'Data Engineering District',
-    'Data Analysis District',
-    'UI/UX District',
-    'Back-End District',
-    'Front-End District',
-]
-
-# Function to correct the district name by always choosing the best match
-def correct_district_name(ocr_name, valid_names):
-    best_match, score = process.extractOne(ocr_name, valid_names)
-    return best_match
-
-district_df['district_name'] = district_df['district_name'].apply(
-    lambda name: correct_district_name(name, valid_district_names)
-)
-
 crime_df = pd.read_json('crime_records.json')
 crime_df = crime_df[crime_df['crime_type'].notnull() & (crime_df['crime_type'].str.strip() != '')]
 
