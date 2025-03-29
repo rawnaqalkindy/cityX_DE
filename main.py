@@ -5,7 +5,6 @@ from datetime import datetime
 import pytesseract
 from pdf2image import convert_from_path
 from sqlalchemy import create_engine
-from fuzzywuzzy import process  # For fuzzy matching
 
 # 1. Extracting data from pdf using OCR
 pdf = 'district_info.pdf'
