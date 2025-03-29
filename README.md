@@ -12,9 +12,9 @@ This project combines and cleans crime records from a JSON file and district det
 2. **Install Dependencies:**  
    In the project root, run:
    ```bash
+   docker-compose up -d
    pip install --no-cache-dir -r requirements.txt
    brew install tesseract
-   docker-compose up -d
    ```
 
 3. **Run the code:**
