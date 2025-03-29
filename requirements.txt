@@ -6,3 +6,4 @@ SQLAlchemy==1.4.46
 psycopg2-binary==2.9.3
 streamlit==1.20.0
 fuzzywuzzy==0.18.0
+setuptools>=65.5.0
